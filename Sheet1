@@ -1,0 +1,164 @@
+Sub Sheet1()
+    'MsgBox "sa"
+    'a = InputBox("sonuç ne 'ENG' mi 'TR' mi")
+'
+'    Dim nerden As Range
+'    Dim nereye As Range
+'
+'
+'    'Set nerden = Application.InputBox("nerden ", Type:=8)
+'    'Set nereye = Application.InputBox("nereye ", Type:=8)
+    
+
+    
+    'MsgBox nerdenStr
+    
+    
+    
+    'sözlüğü seçiyoruzzz
+    Dim sozlukPath As String
+    MsgBox "sözlük"
+    sozlukPath = Application.GetOpenFilename()
+    'sozlukPath = "\\fileserver\profiles$\GKARACAS\Desktop\kod\çeviri\sozluk.xlsx"
+    Dim objWorkbook As Workbook
+    Set objWorkbook = Workbooks.Open(sozlukPath)
+    
+    'değiecek
+    Dim dosyaPath As String
+    MsgBox "dosya"
+    dosyaPath = Application.GetOpenFilename()
+    'dosyaPath = "\\fileserver\profiles$\GKARACAS\Desktop\kod\çeviri\denek.xlsx"
+    Dim dosyaWorkbook As Workbook
+    Set dosyaWorkbook = Workbooks.Open(dosyaPath)
+    
+
+    Dim sheetName As String
+    'sheetName = "Sheet1"
+    sheetName = Application.InputBox("sheet? : ")
+    Sheets(sheetName).Select
+    
+    
+    Dim bolukPorcuk() As String
+    Dim A As Range
+    Set A = Application.InputBox("nerden: ", "Obtain Range Object", Type:=8)
+    bolukPorcuk = Split(A.Address, "$")
+    
+    Dim nerdenStr As String
+    'nerdenStr = Application.InputBox("nerden Column harf: ")
+    'nerdenStr = "A"
+    nerdenStr = bolukPorcuk(1)
+    
+    
+    Dim nerdenBasRow As Integer
+    'nerdenBasRow = Application.InputBox("nerden başla Row 3 5 bişi: ")
+    'nerdenBasRow = 1
+    nerdenBasRow = bolukPorcuk(2)
+    Dim nerdenBitRow As Integer
+    'nerdenBitRow = Application.InputBox("nerden bit Row 10 12 bişi: ")
+    'nerdenBitRow = 5
+    Set A = Application.InputBox("nereye kadar: ", "Obtain Range Object", Type:=8)
+    bolukPorcuk = Split(A.Address, "$")
+    nerdenBitRow = bolukPorcuk(2)
+    
+    Dim nereyeStr As String
+    'nereyeStr = InputBox("nereye harf: ")
+    'nereyeStr = "C"
+    Set A = Application.InputBox("nereye yazdır: ", "Obtain Range Object", Type:=8)
+    bolukPorcuk = Split(A.Address, "$")
+    nereyeStr = bolukPorcuk(1)
+    
+    
+    Dim cevirStr As String
+    Dim i As Integer
+    i = nerdenBasRow
+    Dim j As Integer
+    j = 0
+    
+    Dim sozlukBuyuklugu As Long
+    sozlukBuyuklugu = objWorkbook.Worksheets("sheet1").Range("A65000").End(xlUp).Row
+    
+    
+    
+    
+    'For Each myWord In dosyaWorkbook.Sheets(sheetName).Range((rangee & ":" & nerdenStr & nerdenBitRow))
+    For Each myWord In dosyaWorkbook.Sheets(sheetName).Range((nerdenStr & nerdenBasRow & ":" & nerdenStr & nerdenBitRow))
+        
+        'MsgBox ("my word: " & myWord)
+        
+        myWord = UCase(myWord)
+        ' "-" ve "_" ları " " yap
+        If InStr(UCase(myWord), "-") > 0 Then
+            myWord = Replace(myWord, "-", " - ")
+        End If
+        
+        If InStr(UCase(myWord), "-") > 0 Then
+            myWord = Replace(myWord, "_", " _ ")
+        End If
+                    
+            
+        'kelimelere böldüm
+        Dim arrSplitString() As String
+        arrSplitString = Split(myWord, " ")
+        Dim intInArrSplitString As Integer
+        intInArrSplitString = 0
+        
+        For Each miniMyWord In arrSplitString
+            j = 0
+            For Each word In objWorkbook.Worksheets("sheet1").Range("A1:A" & sozlukBuyuklugu)
+                j = j + 1
+                If UCase(miniMyWord) = UCase(word) Then
+                    arrSplitString(intInArrSplitString) = UCase(objWorkbook.Worksheets("sheet1").Range("B" & j))
+                End If
+                
+                
+            Next word
+            
+            intInArrSplitString = intInArrSplitString + 1
+        Next miniMyWord
+        
+
+        dosyaWorkbook.Sheets(sheetName).Range(nereyeStr & i).Value = Join(arrSplitString, " ")
+        
+        
+        
+'        j = 0
+'        For Each word In objWorkbook.Worksheets("sheet1").Range("A1:A" & sozlukBuyuklugu)
+'            j = j + 1
+'
+'
+'            MsgBox Join(arrSplitString, " ")
+'
+'
+''            If InStr(UCase(myWord), UCase(word)) > 0 Then
+''
+''                myWord = UCase(myWord)
+''
+''                'MsgBox myWord
+''                myWord = Replace(myWord, UCase(word), UCase(objWorkbook.Worksheets("sheet1").Range("B" & j)))
+''                'MsgBox "çevirince: " & myWord
+''                dosyaWorkbook.Sheets(sheetName).Range(nereyeStr & i).Value = myWord
+''            End If
+''            'MsgBox ("if bitimi: " & myWord)
+'        Next word
+        
+        
+        
+        i = i + 1
+        
+        
+        
+    Next myWord
+    
+    
+    
+    
+
+    
+    
+    
+    'dosyaWorkbook.Close
+    objWorkbook.Close
+    MsgBox "tamamlandı"
+    
+    
+End Sub
